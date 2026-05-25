@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # function to check for nested loops in the code
-def check_nested_loops(code: str, filename: str) -> list[dict]:
+def check_nested_loops(filename: str, code: str) -> list[dict]:
     findings = []
 
     try:
@@ -17,9 +17,9 @@ def check_nested_loops(code: str, filename: str) -> list[dict]:
                 for child in node.body:
                     if isinstance(child,loop_type):
                         findings.append({
-                            filename: filename,
+                            "filename": filename,
                             "line": node.lineno,
-                            "severity": "Medium",
+                            "severity": "MEDIUM",
                             "rule": "Nestded Loops",
                             "issue": "Direct Nested loop dectected "
                         })
@@ -28,7 +28,7 @@ def check_nested_loops(code: str, filename: str) -> list[dict]:
         logger.error("Syntax error in file %s: %s", filename, e)
     return findings
 
-def large_functions(code: str, filename: str) -> list[dict]:
+def large_functions(filename: str, code: str) -> list[dict]:
     findings = []
     try:
         tree = ast.parse(code, filename=filename)
@@ -40,7 +40,7 @@ def large_functions(code: str, filename: str) -> list[dict]:
                     findings.append({
                         "filename": filename,
                         "line": node.lineno,
-                        "severity": "Medium",
+                        "severity": "MEDIUM",
                         "rule": "Large Function",
                         "issue": f"Function '{node.name}' is too long ({length} lines) consider refactoring."
                     })
@@ -199,6 +199,7 @@ AST_RULES = [
     check_eval_exec,
     check_nested_loops,
     check_bare_except,
+    large_functions,
 ]
 
 REGEX_RULES = [

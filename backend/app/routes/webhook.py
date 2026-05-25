@@ -48,11 +48,14 @@ async def webhook(
     diff = await fetch_pr_data(pr_data["repo"], pr_data["number"])
     if diff:
         logger.info("Diff fetched — %d chars", len(diff))
-        static_analysis_results = await Static_analysis(diff)
-        logger.info("Static analysis completed — %d findings", len(static_analysis_results))
+        analysis = await Static_analysis(diff)
+        findings = analysis["findings"]
+        risk = analysis["risk"]
+        logger.info(
+            "Analysis complete — %d findings — Risk: %s (score: %d)",
+            len(findings), risk["risk_level"], risk["score"],
+        )
     else:
         logger.warning("No diff available for PR #%s", pr_data["number"])
-
-    print(f'message:"webhook received successfully, record_id: {record.id}')
 
     return {"message": "Webhook received successfully", "record_id": record.id}

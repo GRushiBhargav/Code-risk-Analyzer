@@ -1,10 +1,11 @@
 import json
 import logging
-from fastapi import APIRouter, Request, HTTPException, Header , Depends
-from backend.app.services.github_services import verify_github_signature
+from fastapi import APIRouter, Request, HTTPException, Header, Depends
+from backend.app.services.github_services import verify_github_signature, fetch_pr_data
 from backend.app.services.database_service import save_pull_request_event
 from backend.app.database.session import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+from backend.app.services.static_analysis import Static_analysis
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -14,7 +15,10 @@ ALLOWED_ACTIONS = {"opened", "synchronize", "reopened", "closed"}
 
 @router.post("/webhook")
 async def webhook(
-    request: Request, x_hub_signature_256: str | None = Header(default=None), db: AsyncSession = Depends(get_db) ):
+    request: Request,
+    x_hub_signature_256: str | None = Header(default=None),
+    db: AsyncSession = Depends(get_db),
+):
     raw_body = await request.body()
 
     if not verify_github_signature(raw_body, x_hub_signature_256):
@@ -40,5 +44,15 @@ async def webhook(
     }
     record = await save_pull_request_event(db, pr_data)
     logger.info("PR #%s - action: %s", pr.get("number"), action)
+
+    diff = await fetch_pr_data(pr_data["repo"], pr_data["number"])
+    if diff:
+        logger.info("Diff fetched — %d chars", len(diff))
+        static_analysis_results = await Static_analysis(diff)
+        logger.info("Static analysis completed — %d findings", len(static_analysis_results))
+    else:
+        logger.warning("No diff available for PR #%s", pr_data["number"])
+
     print(f'message:"webhook received successfully, record_id: {record.id}')
+
     return {"message": "Webhook received successfully", "record_id": record.id}

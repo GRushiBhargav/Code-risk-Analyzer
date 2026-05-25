@@ -3,7 +3,9 @@ from fastapi import FastAPI
 from backend.app.routes import webhook
 from backend.app.database.session import engine, Base
 from backend.app.models import models  # ← correct path
+import logging
 
+logging.basicConfig(level=logging.INFO)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

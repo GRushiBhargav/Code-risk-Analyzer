@@ -26,3 +26,20 @@ async def fetch_pr_data(repo:str, pr_number:int):
             return None
         response.raise_for_status()
         return response.text
+
+async def post_pr_comment(repo:str,pr_number:int,comments:str):
+
+    url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
+    header = {
+        "Authorization": f"Bearer {settings.GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json",
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url,headers=header,json={"body":comments})
+        if response.status_code == 201:
+            logger.info("Comment posted to PR #%s", pr_number)
+            return True
+        logger.error(
+            "Failed to post comment: %s — %s", response.status_code, response.text
+        )
+        return False

@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     GITHUB_WEBHOOK_SECRET: str
     DATABASE_URL: str
     GITHUB_TOKEN: str
+    GEMINI_API_KEY: str
 
     class Config:
         env_file = BASE_DIR / ".env"

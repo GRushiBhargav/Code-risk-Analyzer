@@ -3,8 +3,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 SEVERITY_WEIGHTS = {
-    "HIGH": 10,
-    "MEDIUM": 5,
+    "HIGH": 8,
+    "MEDIUM": 3,
     "LOW": 1,
 }
 

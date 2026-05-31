@@ -61,6 +61,6 @@ async def webhook(
         if action in ("opened", "reopened"):
             comments = format_pr_comment(risk,findings,ai_review)
             await post_pr_comment(pr_data["repo"],pr_data["number"],comments)
-        logger.warning("No diff available for PR #%s", pr_data["number"])
+    logger.warning("No diff available for PR #%s", pr_data["number"])
 
     return {"message": "Webhook received successfully", "record_id": record.id}

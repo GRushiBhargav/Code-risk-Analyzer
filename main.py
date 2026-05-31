@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from backend.app.routes import webhook
+from backend.app.routes import frontend_analytics
 from backend.app.database.session import engine, Base
 from backend.app.models import models  # ← correct path
 import logging
@@ -23,3 +24,4 @@ def read_root():
 
 
 app.include_router(webhook.router)
+app.include_router(frontend_analytics.router)

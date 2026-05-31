@@ -18,7 +18,7 @@ async def save_pull_request_event(db: AsyncSession, pr_data: dict):
     await db.refresh(pr)
     return pr
 
-async def save_alanysis_result(db:AsyncSession,pr_id:int, analysis: dict,ai_analysis:str = None):
+async def save_alanysis_result(db:AsyncSession,pr_id:int, analysis: dict,ai_analysis:str| None):
     risk = analysis["risk"]
     result = AnalysisResult(
         pr_number = pr_id,

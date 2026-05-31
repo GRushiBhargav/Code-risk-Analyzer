@@ -16,13 +16,15 @@ def check_nested_loops(filename: str, code: str) -> list[dict]:
             if isinstance(node,loop_type):
                 for child in node.body:
                     if isinstance(child,loop_type):
-                        findings.append({
-                            "filename": filename,
-                            "line": node.lineno,
-                            "severity": "MEDIUM",
-                            "rule": "Nestded Loops",
-                            "issue": "Direct Nested loop dectected "
-                        })
+                        findings.append(
+                            {
+                                "filename": filename,
+                                "line": node.lineno,
+                                "severity": "MEDIUM",
+                                "rule": "NESTED_LOOP",
+                                "issue": "Direct Nested loop dectected ",
+                            }
+                        )
                         break
     except SyntaxError as e:
         logger.error("Syntax error in file %s: %s", filename, e)
@@ -37,13 +39,15 @@ def large_functions(filename: str, code: str) -> list[dict]:
                 end_line = getattr(node, 'end_lineno', node.lineno)
                 length = end_line - node.lineno + 1
                 if length > 50:
-                    findings.append({
-                        "filename": filename,
-                        "line": node.lineno,
-                        "severity": "MEDIUM",
-                        "rule": "Large Function",
-                        "issue": f"Function '{node.name}' is too long ({length} lines) consider refactoring."
-                    })
+                    findings.append(
+                        {
+                            "filename": filename,
+                            "line": node.lineno,
+                            "severity": "MEDIUM",
+                            "rule": "LARGE_FUNCTION",
+                            "issue": f"Function '{node.name}' is too long ({length} lines) consider refactoring.",
+                        }
+                    )
     except SyntaxError as e:
         logger.error("Syntax error in file %s: %s", filename, e)
     return findings

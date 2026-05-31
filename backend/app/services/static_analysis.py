@@ -5,7 +5,7 @@ import json  # to parse bandit output
 import logging  # for logging activities and errors
 from .rule_base_analysis import run_rules
 from .scorer import calculate_risk_score
-
+import asyncio
 logger = logging.getLogger(__name__)
 
 
@@ -14,12 +14,12 @@ async def Static_analysis(diff: str):
 
     if not file:
         logger.info("No Python files found in the diff.")
-        return {"findings": [], "risk": {"score": 0, "risk_level": "CLEAN"}}
+        return {"findings": [], "risk": calculate_risk_score([])}
 
     all_findings = []
     for filename, code in file.items():
         logger.info("running bandit analysis on %s", filename)
-        findings = run_bandit(filename, code)
+        findings = await asyncio.to_thread(run_bandit, filename, code)
         logger.info("Bandit findings: %d", len(findings))
 
         logger.info("running rulebased analysis on %s", filename)
@@ -63,7 +63,7 @@ def run_bandit(filename: str, code: str) -> list:
         temp_path = f.name
     try:
         result = subprocess.run(
-            ["bandit", "-f", "json", "-q", temp_path], capture_output=True, text=True
+            ["bandit", "-f", "json", "-q", temp_path], capture_output=True, text=True, timeout=60,
         )
         if not result.stdout:
             return []

@@ -128,6 +128,7 @@ code-risk-project/
 ### Prerequisites
 
 - Python 3.12+
+- [uv](https://docs.astral.sh/uv/) (Python package manager — `pip install uv` or see install docs)
 - Node.js 18+
 - PostgreSQL 14+
 - A GitHub personal access token (with `repo` / pull request + issues write access)
@@ -142,16 +143,16 @@ cd code-risk-analyzer
 
 ### 2. Backend setup
 
+This project uses [uv](https://docs.astral.sh/uv/) for Python dependency management.
+
 ```bash
 cd Backend
 
-# create + activate virtual environment
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-
-# install dependencies
-pip install -r requirements.txt
+# install dependencies into a managed virtual environment
+uv sync
 ```
+
+`uv sync` reads `pyproject.toml` / `uv.lock` and sets up the environment automatically — no manual `venv` or `pip install` needed.
 
 Create a `.env` file in the `Backend/` directory:
 
@@ -168,10 +169,16 @@ Create the database:
 psql -U postgres -c "CREATE DATABASE coderisk;"
 ```
 
-Run the server (tables are created automatically on startup):
+Apply database migrations:
 
 ```bash
-uvicorn main:app --reload
+uv run alembic upgrade head
+```
+
+Run the server:
+
+```bash
+uv run uvicorn main:app --reload
 ```
 
 The API is now available at `http://localhost:8000` — interactive docs at `http://localhost:8000/docs`.

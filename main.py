@@ -5,19 +5,20 @@ from backend.app.routes import frontend_analytics
 from backend.app.database.session import engine, Base
 from backend.app.models import models  # ← correct path
 import logging
+from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(level=logging.INFO)
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
 
+app = FastAPI()
 
-app = FastAPI(lifespan=lifespan)
-
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Vite dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
